@@ -1,0 +1,35 @@
+node:
+  # - node_type: expansion
+  #   module:
+  #     - module_type: hyde
+  - node_type: retrieval
+    module:
+      - module_type: vectordb
+        top_k: 20
+        embedding_model: BAAI/bge-m3
+      # - module_type: bm25
+      #   top_k: 20
+      #   tokenizer: ko_kiwi
+      # - module_type: hybrid_rrf
+      #   target_modules: ('bm25', 'vectordb')
+      #   rrf_k: 60
+      # - module_type: hybrid_cc
+      #   target_modules: ('bm25', 'vectordb')
+      #   weights:
+      #     - (0.5, 0.5)
+  - node_type: rerank
+    module:
+      - module_type: koreranker
+        model_name: Dongjin-kr/ko-reranker
+        top_k: 3
+  - node_type: prompt
+    module:
+      - module_type: prompt_marker
+        prompt_list: ["다음과 같은 맥락을 사용하여 마지막 질문에 대답하십시오. 만약 답을 모르면 모른다고만 말하고 답을 지어내려고 하지 마십시오. 답변은 반드시 한국어로 답변하시오. {contents} 질문: {question} 답변:",
+                      "질문에 답할 구절을 작성해 주세요. 답변은 반드시 한국어로 답변하시오. {contents} 질문: {question} 답변:"]
+  - node_type: generator
+    module:
+      - module_type: huggingface_model
+        model_name: Qwen/Qwen2-7B-Instruct
+        temperature: 0
+        dtype: bf16
